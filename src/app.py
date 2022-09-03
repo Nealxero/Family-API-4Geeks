@@ -27,16 +27,41 @@ def sitemap():
 
 @app.route('/members', methods=['GET'])
 def handle_hello():
-
     # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
-    response_body = {
-        "hello": "world",
-        "family": members
-    }
+    return jsonify(members), 200
 
+@app.route('/member/<id>', methods=['GET'])
+def getMember(id):
+    # this is how you can use the Family datastructure by calling its methods
+    ok = jackson_family.get_member(id)
+    if not ok:
+        return "Something went wrong looking for the ID", 400
+    return jsonify(ok), 200
 
-    return jsonify(response_body), 200
+@app.route('/member', methods=['POST'])
+def add_member():
+    # this is how you can use the Family datastructure by calling its methods
+    memberId = jackson_family.add_member(request.json)
+    return jsonify({"memberId":memberId}), 200
+    
+@app.route('/members/<int:id>', methods=['PUT'])
+def update_member(id):
+    # this is how you can use the Family datastructure by calling its methods
+    member=request.json
+    ok = jackson_family.update_member(id, member)
+    if not ok:
+        return "couldnt edit the data", 400
+    return jsonify({"ok": ok}), 200
+
+@app.route('/member/<int:id>', methods=['DELETE'])
+def delete_member(id):
+    # this is how you can use the Family datastructure by calling its methods
+    success = jackson_family.delete_member(id)
+    if (success): 
+        return jsonify({"done":True}), 200
+    return "Something went wrong trying to delete, try again", 400
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
